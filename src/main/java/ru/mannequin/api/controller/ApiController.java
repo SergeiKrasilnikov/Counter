@@ -12,7 +12,7 @@ import java.util.Map;
 @RequestMapping("/api")
 public class ApiController {
 
-    /* Ъранилище счётчиков */
+    /* Хранилище счётчиков */
     private Map<String, Integer> counters = new HashMap<>();
 
     @PutMapping("/create")
@@ -21,6 +21,7 @@ public class ApiController {
 
         Map<String, String> ret = new HashMap<>();
         ret.put("success", "true");
+        ret.put("name", counterName);
         return ResponseEntity.ok().body(ret);
     }
 }
