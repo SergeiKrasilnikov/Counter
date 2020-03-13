@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.mannequin.api.controller.message.ApiMessage;
+import ru.mannequin.api.controller.message.ApiValue;
 
 import javax.annotation.PostConstruct;
 import java.util.HashMap;
@@ -25,9 +26,9 @@ public class ApiController {
      */
     @PutMapping("/create")
     public ResponseEntity<Object> createCounter(@RequestParam(name = "name") String counterName) {
-        log.info("Получен запрос на создание нового счётчика: {}", counterName);
+        log.info("Запрос на создание нового счётчика: {}", counterName);
 
-        if (counters.keySet().contains(counterName)) {
+        if (counters.containsKey(counterName)) {
             log.info("Счётчик с именем \"{}\" уже существует. Создание нового не производится.");
             ApiMessage message = new ApiMessage(false, "Счётчик " + counterName + " уже существует.");
             return ResponseEntity.ok().body(message);
@@ -39,18 +40,35 @@ public class ApiController {
         return ResponseEntity.ok().body(message);
     }
 
-    /* TODO Инкремент значения счетчика с указанным именем; */
+    /**
+     * Инкремент значения счетчика с указанным именем
+     * @param counterName
+     * @return
+     */
     @PostMapping("/increment")
     public ResponseEntity<Object> incrementCounter(@RequestParam(name="name") String counterName) {
-        log.info("Получен запрос на инкремент счётчика {}.", counterName);
+        log.info("Запрос на инкремент счётчика {}.", counterName);
+
+        if (!counters.containsKey(counterName)) {
+            return ResponseEntity.ok(new ApiMessage(false, "Счётчик с именем \"" + counterName + "\" не найден."));
+        }
 
         counters.get(counterName).incrementAndGet();
 
-        ApiMessage message = new ApiMessage(true, "Счётчик " + counterName + " инкрементирован.");
-        return ResponseEntity.ok(message);
+        return ResponseEntity.ok(new ApiMessage(true, "Счётчик " + counterName + " инкрементирован."));
     }
 
-    /* TODO Получить значения счетчика с указанным именем; */
+    /* Получить значения счетчика с указанным именем; */
+    @GetMapping("/value")
+    public ResponseEntity<Object> getCounterValue(@RequestParam(name="name") String counterName) {
+        log.info("Запрос на получение значения счётчика {}", counterName);
+
+        if (!counters.containsKey(counterName)) {
+            return ResponseEntity.ok(new ApiMessage(false, "Счётчик с именем \"" + counterName + "\" не найден."));
+        }
+
+        return  ResponseEntity.ok(new ApiValue(true, counters.get(counterName).intValue()));
+    }
 
     /* TODO Удалить счетчик с указанным именем; */
 
