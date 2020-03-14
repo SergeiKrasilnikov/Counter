@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 public class ApiController {
 
     /* Хранилище счётчиков */
-    private HashMap<String, AtomicInteger> counters = new HashMap<>();
+    private ConcurrentHashMap<String, AtomicInteger> counters = new ConcurrentHashMap<>();
 
     /**
      * Создать счетчик с уникальным именем;
@@ -58,6 +58,7 @@ public class ApiController {
         }
 
         counters.get(counterName).incrementAndGet();
+//        counters.put(counterName, counters.get(counterName) + 1);
 
         return ResponseEntity.ok(new ApiMessage(true, "Счётчик " + counterName + " инкрементирован."));
     }
