@@ -29,7 +29,7 @@ public class ApiController {
         log.info("Запрос на создание нового счётчика: {}", counterName);
 
         if (counters.containsKey(counterName)) {
-            log.info("Счётчик с именем \"{}\" уже существует. Создание нового не производится.");
+            log.info("Счётчик с именем \"{}\" уже существует. Создание нового не производится.", counterName);
             ApiMessage message = new ApiMessage(false, "Счётчик " + counterName + " уже существует.");
             return ResponseEntity.ok().body(message);
         }
@@ -50,7 +50,7 @@ public class ApiController {
         log.info("Запрос на инкремент счётчика {}.", counterName);
 
         if (!counters.containsKey(counterName)) {
-            return ResponseEntity.ok(new ApiMessage(false, "Счётчик с именем \"" + counterName + "\" не найден."));
+            return ResponseEntity.ok(new ApiMessage(false, "Счётчик " + counterName + " не найден."));
         }
 
         counters.get(counterName).incrementAndGet();
@@ -61,16 +61,32 @@ public class ApiController {
     /* Получить значения счетчика с указанным именем; */
     @GetMapping("/value")
     public ResponseEntity<Object> getCounterValue(@RequestParam(name="name") String counterName) {
-        log.info("Запрос на получение значения счётчика {}", counterName);
+        log.info("Запрос на получение значения счётчика {}.", counterName);
 
         if (!counters.containsKey(counterName)) {
-            return ResponseEntity.ok(new ApiMessage(false, "Счётчик с именем \"" + counterName + "\" не найден."));
+            return ResponseEntity.ok(new ApiMessage(false, "Счётчик " + counterName + " не найден."));
         }
 
         return  ResponseEntity.ok(new ApiValue(true, counters.get(counterName).intValue()));
     }
 
-    /* TODO Удалить счетчик с указанным именем; */
+    /**
+     * Удалить счетчик с указанным именем
+     * @param counterName
+     * @return
+     */
+    @DeleteMapping("/delete")
+    public ResponseEntity<Object> deleteCounter(@RequestParam(name="name") String counterName) {
+        log.info("Запрос на удаление счётчика {}.", counterName);
+
+        if (!counters.containsKey(counterName)) {
+            return ResponseEntity.ok(new ApiMessage(false, "Счётчик " + counterName + " не найден."));
+        }
+
+        counters.remove(counterName);
+
+        return ResponseEntity.ok(new ApiMessage(true, "Счётчик " + counterName + " удалён."));
+    }
 
     /* TODO Получить суммарное значение всех счетчиков; */
 
