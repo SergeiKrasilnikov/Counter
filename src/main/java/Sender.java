@@ -20,15 +20,12 @@ public class Sender {
 
         ExecutorService executorService = Executors.newCachedThreadPool();
         for (int i = 0; i < 1; i++) {
-            executorService.submit(new Runnable() {
-                @Override
-                public void run() {
-                    sender.incrementNamedCounter("abc");
-                    sender.incrementNamedCounter("abc");
-                    sender.incrementNamedCounter("abc");
-                    sender.incrementNamedCounter("abc");
-                    sender.incrementNamedCounter("abc");
-                }
+            executorService.submit(() -> {
+                sender.incrementNamedCounter("abc");
+                sender.incrementNamedCounter("abc");
+                sender.incrementNamedCounter("abc");
+                sender.incrementNamedCounter("abc");
+                sender.incrementNamedCounter("abc");
             });
         }
 
@@ -37,7 +34,24 @@ public class Sender {
 
         sender.getCounterValue("abc");
 
-        sender.deleteCounter("abc");
+//        sender.deleteCounter("abc");
+
+        sender.getCountersSum();
+    }
+
+    private void getCountersSum() {
+        log.debug("Отправка запроса на сумму всех счётчиков.");
+        try {
+            URI uri = new URIBuilder("http://localhost:8080/api/sum").build();
+            HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection();
+            connection.setRequestMethod("GET");
+            int responseCode = connection.getResponseCode();
+//            log.debug("При отправке sum получен код {}", responseCode);
+            InputStream stream = connection.getInputStream();
+            log.debug("Ответ на sum: " + IOUtils.toString(stream, StandardCharsets.UTF_8));
+        } catch (Exception e) {
+            log.error("Ошибка при получении суммы всех счётчиков", e);
+        }
     }
 
     private void deleteCounter(String counterName) {

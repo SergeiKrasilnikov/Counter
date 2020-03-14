@@ -9,6 +9,7 @@ import ru.mannequin.api.controller.message.ApiValue;
 import javax.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @RestController
@@ -17,7 +18,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class ApiController {
 
     /* Хранилище счётчиков */
-    private Map<String, AtomicInteger> counters = new HashMap<>();
+    private HashMap<String, AtomicInteger> counters = new HashMap<>();
 
     /**
      * Создать счетчик с уникальным именем;
@@ -88,7 +89,18 @@ public class ApiController {
         return ResponseEntity.ok(new ApiMessage(true, "Счётчик " + counterName + " удалён."));
     }
 
-    /* TODO Получить суммарное значение всех счетчиков; */
+    /**
+     * Получить суммарное значение всех счетчиков
+     * @return
+     */
+    @GetMapping("/sum")
+    public ResponseEntity<Object> getSum() {
+        log.info("Запрос на получение суммы всех счётчиков.");
+
+        int count = counters.entrySet().stream().mapToInt(item -> item.getValue().intValue()).sum();
+
+        return ResponseEntity.ok(new ApiValue(true, count));
+    }
 
     /* TODO Получить уникальные имена счетчиков в виде списка. */
 }
