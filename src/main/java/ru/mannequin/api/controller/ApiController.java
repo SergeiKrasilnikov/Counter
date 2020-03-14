@@ -3,14 +3,17 @@ package ru.mannequin.api.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.mannequin.api.controller.message.ApiList;
 import ru.mannequin.api.controller.message.ApiMessage;
 import ru.mannequin.api.controller.message.ApiValue;
 
 import javax.annotation.PostConstruct;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 @RestController
 @Slf4j
@@ -102,5 +105,16 @@ public class ApiController {
         return ResponseEntity.ok(new ApiValue(true, count));
     }
 
-    /* TODO Получить уникальные имена счетчиков в виде списка. */
+    /**
+     * Получить уникальные имена счетчиков в виде списка.
+     * @return
+     */
+    @GetMapping("/list")
+    public ResponseEntity<Object> getList() {
+        log.info("Запрос на получение списка счётчиков.");
+
+        List<String > names = counters.keySet().stream().collect(Collectors.toList());
+
+        return ResponseEntity.ok(new ApiList(true, names));
+    }
 }
